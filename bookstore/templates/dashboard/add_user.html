@@ -17,7 +17,7 @@
             <div class="card mb-3">
                 <div class="card-header">
                     <i class="fas fa-table"></i>
-                    Crud Add
+                    اضافه کردن کاربر
                 </div>
                 <div class="card-body">
                   <form class="form-horizontal" action="{% url 'create_user' %}" method="POST">
@@ -26,14 +26,14 @@
                         <div class="form-row">
                             <div class="col-md-6">
                                 <div class="form-label-group">
-                                    <input type="text" class="form-control" name="first_name" placeholder="First Name" id="inputFirst" required="">
-                                    <label for="inputFirst">First Name</label>
+                                    <input type="text" class="form-control" name="first_name" placeholder="نام" id="inputFirst" required="">
+                                    <label for="inputFirst">نام</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-label-group">
-                                    <input type="text" class="form-control" name="last_name" placeholder="Last Name" id="inputLast" required="">
-                                    <label for="inputLast">Last Name</label>
+                                    <input type="text" class="form-control" name="last_name" placeholder="نام خانوادگی" id="inputLast" required="">
+                                    <label for="inputLast">نام خانوادگی</label>
                                 </div>
                             </div>
                         </div>
@@ -42,14 +42,14 @@
                         <div class="form-row">
                             <div class="col-md-6">
                                 <div class="form-label-group">
-                                    <input type="text" class="form-control" name="username" placeholder="Username" id="inputdescription" required="">
-                                    <label for="inputdescription">Username</label>
+                                    <input type="text" class="form-control" name="username" placeholder="نام کاربری" id="inputdescription" required="">
+                                    <label for="inputdescription">نام کاربری</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-label-group">
-                                    <input class="form-control" type="tel" name="email" placeholder="Email" id="inputMobile" required="">
-                                    <label for="inputMobile">Email</label>
+                                    <input class="form-control" type="tel" name="email" placeholder="ایمیل" id="inputMobile" required="">
+                                    <label for="inputMobile">ایمیل</label>
                                 </div>
                             </div>
                         </div>
@@ -58,8 +58,8 @@
                         <div class="form-row">
                             <div class="col-md-6">
                                <div class="form-label-group">
-                                    <input type="text" class="form-control" name="password" placeholder="Password" id="inputdescription" required="">
-                                    <label for="inputdescription">Password</label>
+                                    <input type="text" class="form-control" name="password" placeholder="رمزعبور" id="inputdescription" required="">
+                                    <label for="inputdescription">رمز عبور</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-primary btn-block" type="submit">Submit &nbsp;&nbsp;&nbsp;<span></span></button>
+                    <button class="btn btn-primary btn-block" type="submit">تایید &nbsp;&nbsp;&nbsp;<span></span></button>
                 </form>
                 </div>
             </div>

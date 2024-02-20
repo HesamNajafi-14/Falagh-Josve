@@ -122,3 +122,49 @@ li{
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+.navbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #333;
+  position: fixed;
+  width: 100%;
+}
+
+.navbar-brand {
+  color: #00a1ff;
+  font-size:  24px;
+  text-decoration: none;
+}
+
+.nav-item {
+  list-style-type: none;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+  }
+
+  .navbar-brand {
+    margin-bottom: 10px;
+  }
+
+  .navbar-nav {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .nav-item {
+    margin-bottom: 10px;
+  }
+}
+

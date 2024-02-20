@@ -1,13 +1,13 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views import generic
 from bootstrap_modal_forms.mixins import PassRequestMixin
-from .models import User, Book, Chat, DeleteRequest, Feedback
+from .models import User, Book , DeleteRequest, Feedback, Category
 from django.contrib import messages
 from django.db.models import Sum
 from django.views.generic import CreateView, DetailView, DeleteView, UpdateView, ListView
-from .forms import ChatForm, BookForm, UserForm
+from .forms import UserForm ,BookForm
 from . import models
 import operator
 import itertools
@@ -18,10 +18,37 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from os.path import splitext
+class CategoryListView(LoginRequiredMixin, ListView):
+    model = Book
+    template_name = 'publisher/category_list.html'
+    context_object_name = 'books'
 
+    def get_queryset(self):
+        category_name = self.kwargs['foo'].replace('-', ' ')
+        self.category = get_object_or_404(Category, name=category_name)
+        return Book.objects.filter(category=self.category).order_by("id")
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryListView, self).get_context_data(**kwargs)
+        context['category'] = self.category
+        return context
+
+    def handle_no_permission(self): 
+        messages.error(self.request, "همچین رشته تحصیلی وجود ندارد")
+        return redirect('publisher')
+
+
+class AsliListCategory(LoginRequiredMixin, ListView):
+    model = Category
+    template_name = 'publisher/asli.html'  # <app>/<model>_<viewtype>.html
+    context_object_name = 'categories'
+    paginate_by=10
 
 # Shared Views
 def login_form(request):
+    if request.user.is_authenticated == True:
+        return redirect('publisher')
     return render(request, 'bookstore/login.html')
 
 
@@ -44,7 +71,7 @@ def loginView(request):
             else:
                 return redirect('publisher')
         else:
-            messages.info(request, "Invalid username or password")
+            messages.info(request, "نام کاربری یا رمز عبور اشتباه می باشد")
             return redirect('home')
 
 
@@ -61,17 +88,23 @@ def registerView(request):
 
         a = User(username=username, email=email, password=password)
         a.save()
-        messages.success(request, 'Account was created successfully')
+        messages.success(request, 'اکانت شما با موفقیت ساخته شد')
         return redirect('home')
     else:
-        messages.error(request, 'Registration fail, try again later')
+        messages.error(request, 'ثبت نام ناموفق لطفا دوباره امتحان کنید')
         return redirect('regform')
 
 
 # Publisher views
-@login_required
-def publisher(request):
-    return render(request, 'publisher/home.html')
+#@login_required
+#def publisher(request):
+    #return render(request, 'publisher/home.html')
+
+class AddBookView(LoginRequiredMixin, CreateView):
+    model = Book
+    form_class = BookForm
+    template_name = 'publisher/add_book.html'
+    #fields = ('title', 'author', 'category', 'pdf')
 
 
 @login_required
@@ -96,55 +129,14 @@ def about(request):
 
 @login_required
 def usearch(request):
-    query = request.GET['query']
-    print(type(query))
+        if request.method == "POST":
+            query = request.POST['query']
+            books = Book.objects.filter(title__icontains=query).order_by("id")
 
-    # data = query.split()
-    data = query
-    print(len(data))
-    if (len(data) == 0):
-        return redirect('publisher')
-    else:
-        a = data
-
-        # Searching for It
-        qs5 = models.Book.objects.filter(id__iexact=a).distinct()
-        qs6 = models.Book.objects.filter(id__exact=a).distinct()
-
-        qs7 = models.Book.objects.all().filter(id__contains=a)
-        qs8 = models.Book.objects.select_related().filter(id__contains=a).distinct()
-        qs9 = models.Book.objects.filter(id__startswith=a).distinct()
-        qs10 = models.Book.objects.filter(id__endswith=a).distinct()
-        qs11 = models.Book.objects.filter(id__istartswith=a).distinct()
-        qs12 = models.Book.objects.all().filter(id__icontains=a)
-        qs13 = models.Book.objects.filter(id__iendswith=a).distinct()
-
-        files = itertools.chain(qs5, qs6, qs7, qs8, qs9, qs10, qs11, qs12, qs13)
-
-        res = []
-        for i in files:
-            if i not in res:
-                res.append(i)
-
-        # word variable will be shown in html when user click on search button
-        word = "Searched Result :"
-        print("Result")
-
-        print(res)
-        files = res
-
-        page = request.GET.get('page', 1)
-        paginator = Paginator(files, 10)
-        try:
-            files = paginator.page(page)
-        except PageNotAnInteger:
-            files = paginator.page(1)
-        except EmptyPage:
-            files = paginator.page(paginator.num_pages)
-
-        if files:
-            return render(request, 'publisher/result.html', {'files': files, 'word': word})
-        return render(request, 'publisher/result.html', {'files': files, 'word': word})
+            return render(request, 'publisher/result.html', {'query': query, 'books': books})
+        else:
+            messages.error(request, 'همچین جزوه ای در دیتابیس وجود ندارد')
+            return redirect('publisher')
 
 
 @login_required
@@ -187,55 +179,50 @@ class UBookListView(LoginRequiredMixin, ListView):
     model = Book
     template_name = 'publisher/book_list.html'
     context_object_name = 'books'
-    paginate_by = 2
+    paginate_by = 10
 
     def get_queryset(self):
-        return Book.objects.order_by('-id')
+        return Book.objects.order_by('id')
+
 
 
 @login_required
 def uabook(request):
+    choices = Category.objects.all().values_list('name', 'name')
+    choice_list = []
+    for item in choices:
+        choice_list.append(item) 
+
     if request.method == 'POST':
         title = request.POST['title']
         author = request.POST['author']
-        year = request.POST['year']
-        publisher = request.POST['publisher']
-        desc = request.POST['desc']
-        cover = request.FILES['cover']
+        category_id = request.POST['category']
         pdf = request.FILES['pdf']
+
+        # چک کردن پسوند فایل
+        _, file_extension = splitext(pdf.name)
+        allowed_extensions = ['.zip', '.rar']
+
+        if file_extension.lower() not in allowed_extensions:
+            messages.error(request, 'دوست عزیز لطفا فایل را در قالب .zip یا .rar ارسال کنید')
+            return redirect('publisher')
+
         current_user = request.user
         user_id = current_user.id
         username = current_user.username
 
-        a = Book(title=title, author=author, year=year, publisher=publisher,
-                 desc=desc, cover=cover, pdf=pdf, uploaded_by=username, user_id=user_id)
+        a = Book(title=title, author=author,
+                 pdf=pdf, uploaded_by=username, user_id=user_id, category_id=category_id)
         a.save()
-        messages.success(request, 'Book was uploaded successfully')
+        messages.success(request, 'جزوه شما با موفقیت اضافه شد')
         return redirect('publisher')
     else:
-        messages.error(request, 'Book was not uploaded successfully')
-        return redirect('uabook_form')
+        return render(request, 'publisher/add_book.html', {'categories': choice_list})  # Pass choice_list as categories to the template
 
 
-class UCreateChat(LoginRequiredMixin, CreateView):
-    form_class = ChatForm
-    model = Chat
-    template_name = 'publisher/chat_form.html'
-    success_url = reverse_lazy('ulchat')
-
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.user = self.request.user
-        self.object.save()
-        return super().form_valid(form)
 
 
-class UListChat(LoginRequiredMixin, ListView):
-    model = Chat
-    template_name = 'publisher/chat_list.html'
 
-    def get_queryset(self):
-        return Chat.objects.filter(posted_at__lt=timezone.now()).order_by('posted_at')
 
 
 # Librarian views
@@ -258,22 +245,19 @@ def labook(request):
     if request.method == 'POST':
         title = request.POST['title']
         author = request.POST['author']
-        year = request.POST['year']
-        publisher = request.POST['publisher']
-        desc = request.POST['desc']
-        cover = request.FILES['cover']
+        
         pdf = request.FILES['pdf']
         current_user = request.user
         user_id = current_user.id
         username = current_user.username
 
-        a = Book(title=title, author=author, year=year, publisher=publisher,
-                 desc=desc, cover=cover, pdf=pdf, uploaded_by=username, user_id=user_id)
+        a = Book(title=title, author=author,
+                 pdf=pdf, uploaded_by=username, user_id=user_id)
         a.save()
-        messages.success(request, 'Book was uploaded successfully')
+        messages.success(request, 'فایل شما با موفقیت ثبت گردید')
         return redirect('llbook')
     else:
-        messages.error(request, 'Book was not uploaded successfully')
+        messages.error(request, 'فایل شما ثبت نگردید')
         return redirect('llbook')
 
 
@@ -281,7 +265,7 @@ class LBookListView(LoginRequiredMixin, ListView):
     model = Book
     template_name = 'librarian/book_list.html'
     context_object_name = 'books'
-    paginate_by = 3
+    paginate_by = 5
 
     def get_queryset(self):
         return Book.objects.order_by('-id')
@@ -387,25 +371,7 @@ def lsearch(request):
         return render(request, 'librarian/result.html', {'files': files, 'word': word})
 
 
-class LCreateChat(LoginRequiredMixin, CreateView):
-    form_class = ChatForm
-    model = Chat
-    template_name = 'librarian/chat_form.html'
-    success_url = reverse_lazy('llchat')
 
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.user = self.request.user
-        self.object.save()
-        return super().form_valid(form)
-
-
-class LListChat(LoginRequiredMixin, ListView):
-    model = Chat
-    template_name = 'librarian/chat_list.html'
-
-    def get_queryset(self):
-        return Chat.objects.filter(posted_at__lt=timezone.now()).order_by('posted_at')
 
 
 # Admin views
@@ -445,7 +411,7 @@ class ListUserView(generic.ListView):
     model = User
     template_name = 'dashboard/list_users.html'
     context_object_name = 'users'
-    paginate_by = 4
+    paginate_by = 10
 
     def get_queryset(self):
         return User.objects.order_by('-id')
@@ -494,25 +460,7 @@ class ALViewUser(DetailView):
     template_name = 'dashboard/user_detail.html'
 
 
-class ACreateChat(LoginRequiredMixin, CreateView):
-    form_class = ChatForm
-    model = Chat
-    template_name = 'dashboard/chat_form.html'
-    success_url = reverse_lazy('alchat')
 
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.user = self.request.user
-        self.object.save()
-        return super().form_valid(form)
-
-
-class AListChat(LoginRequiredMixin, ListView):
-    model = Chat
-    template_name = 'dashboard/chat_list.html'
-
-    def get_queryset(self):
-        return Chat.objects.filter(posted_at__lt=timezone.now()).order_by('posted_at')
 
 
 @login_required
@@ -523,32 +471,27 @@ def aabook_form(request):
 @login_required
 def aabook(request):
     if request.method == 'POST':
-        title = request.POST['title']
-        author = request.POST['author']
-        year = request.POST['year']
-        publisher = request.POST['publisher']
-        desc = request.POST['desc']
-        cover = request.FILES['cover']
-        pdf = request.FILES['pdf']
-        current_user = request.user
-        user_id = current_user.id
-        username = current_user.username
-
-        a = Book(title=title, author=author, year=year, publisher=publisher,
-                 desc=desc, cover=cover, pdf=pdf, uploaded_by=username, user_id=user_id)
-        a.save()
-        messages.success(request, 'Book was uploaded successfully')
-        return redirect('albook')
+        form = BookForm(request.POST, request.FILES)
+        if form.is_valid():
+            book = form.save(commit=False)
+            book.uploaded_by = request.user.username
+            book.user_id = request.user.id
+            book.save()
+            messages.success(request, 'Book was uploaded successfully')
+            return redirect('albook')
+        else:
+            messages.error(request, 'Book was not uploaded successfully')
+            return redirect('aabook_form')
     else:
-        messages.error(request, 'Book was not uploaded successfully')
-        return redirect('aabook_form')
+        form = BookForm()
+        return render(request, 'aabook_form.html', {'form': form})
 
 
 class ABookListView(LoginRequiredMixin, ListView):
     model = Book
     template_name = 'dashboard/book_list.html'
     context_object_name = 'books'
-    paginate_by = 3
+    paginate_by = 5
 
     def get_queryset(self):
         return Book.objects.order_by('-id')
@@ -558,7 +501,7 @@ class AManageBook(LoginRequiredMixin, ListView):
     model = Book
     template_name = 'dashboard/manage_books.html'
     context_object_name = 'books'
-    paginate_by = 3
+    paginate_by = 5
 
     def get_queryset(self):
         return Book.objects.order_by('-id')

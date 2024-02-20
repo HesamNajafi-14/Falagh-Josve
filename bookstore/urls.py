@@ -27,31 +27,29 @@ urlpatterns = [
  path('ldbookk/<int:pk>', views.LDeleteView.as_view(), name='ldbookk'),
  path('lvbook/<int:pk>', views.LViewBook.as_view(), name='lvbook'),
  path('lebook/<int:pk>', views.LEditView.as_view(), name='lebook'),
- path('lcchat/', views.LCreateChat.as_view(), name='lcchat'),
- path('llchat/', views.LListChat.as_view(), name='llchat'),
+ 
 
 
 
 
  # Publisher URL's
- path('publisher/', views.UBookListView.as_view(), name='publisher'),
- path('uabook_form/', views.uabook_form, name='uabook_form'),
+ path('publisher/', views.AsliListCategory.as_view(), name='publisher'),
+ path('category/<str:foo>', views.CategoryListView.as_view(), name='category'),
+ path('uabook_form/', views.AddBookView.as_view(), name='uabook_form'),
  path('uabook/', views.uabook, name='uabook'),
- path('ucchat/', views.UCreateChat.as_view(), name='ucchat'),
- path('ulchat/', views.UListChat.as_view(), name='ulchat'),
  path('request_form/', views.request_form, name='request_form'),
  path('delete_request/', views.delete_request, name='delete_request'),
  path('feedback_form/', views.feedback_form, name='feedback_form'),
  path('send_feedback/', views.send_feedback, name='send_feedback'),
  path('about/', views.about, name='about'),
  path('usearch/', views.usearch, name='usearch'),
+ 
 
 
 
  # Admin URL's
  path('dashboard/', views.dashboard, name='dashboard'),
- path('acchat/', views.ACreateChat.as_view(), name='acchat'),
- path('alchat/', views.AListChat.as_view(), name='alchat'),
+
  path('aabook_form/', views.aabook_form, name='aabook_form'),
  path('aabook/', views.aabook, name='aabook'),
  path('albook/', views.ABookListView.as_view(), name='albook'),

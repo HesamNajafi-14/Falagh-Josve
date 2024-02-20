@@ -99,5 +99,35 @@ video {
   top: 0;
   left: 0;
 }
+.form-group {
+  text-align: right;
+  margin-bottom: 1rem; /* Adjust space below each form group */
+}
+
+.form-label {
+  display: block; /* ensures the label takes up its own line */
+  margin-bottom: 0.5rem; /* space between label and input */
+}
+
+.form-control {
+  display: block;
+  width: 100%; /* Makes the input stretch to the full width of its parent */
+  padding: .375rem .75rem; /* Padding inside the input */
+  line-height: 1.5; /* Line height for the text inside the input */
+  border: 1px solid #ced4da; /* Border color */
+  border-radius: .25rem; /* Rounded corners */
+  color: #495057; /* Text color */
+  background-color: #fff; /* Background color */
+  background-clip: padding-box; /* Applying background to padding only */
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out; /* Transition for focus effect */
+}
+
+.form-control:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #80bdff; /* Border color on focus */
+  outline: 0; /* Removes the default outline */
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); /* Adds a shadow-like effect on focus */
+}
 
 

@@ -2,6 +2,7 @@
 {% load static %}
 
 
+
 {% block body %}
 
 
@@ -12,26 +13,26 @@
 </div>
 
 
-<div class="col-sm-10">
+            <div class="col-sm-10">
                 <div class="card mb-3">
-                <div class="card-header">
+                <div class="card-header" style="text-align: right;">
                     <i class="fas fa-table text-primary"></i>
-                    Recent Added Books
+                    لیست جزوات اضافه شده
                 </div>
                 <div class="card-body">
                    <ol class="breadcrumb">
                 <li class="breadcrumb-item">
                     <a href="#"></a>
 
-                    <a  class="btn btn-sm btn-success" href="{% url 'uabook_form' %}" style="padding: 8px; float: right; background-color: green; color: white;">Add Book</a>
+                    <a  class="btn btn-sm btn-success" href="{% url 'uabook_form' %}" style="padding: 8px; float: right; background-color: green; color: white; ">جزوه اضافه کن</a>
                 </li>
             </ol>
 
-             {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
             <div class="card mb-3">
 
                 <div class="card-body">
@@ -40,81 +41,83 @@
 
 
                      
-                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                            <thead>
+                    <table class="table table-bordered"  width="100%" cellspacing="0" dir="rtl">
+                        <thead>
+                        <tr>
+                            <th style="text-align: right;">ایدی جزوه</th>
+                            <th style="text-align: right;">منتشر کننده</th>
+                            <th style="text-align: right;">نام استاد</th>
+                            <th style="text-align: right;">نام جزوه</th>
+                            <th style="text-align: right;">دانلود</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- if and for -->
+                        {% if books %}
+                        {% for book in books %}
                             <tr>
-                                <th>Book ID</th>
-                                <th>Book Cover</th>
-                                <th>Book Title</th>
-                                <th>Read</th>
-                                <th>Download</th>
+                                <td style="text-align: right;">{{ book.id }}</td>
+                                <td style="text-align: right;">{{ book.uploaded_by }}</td>
+                                <td style="text-align: right;">{{ book.author }}</td>
+                                <td style="text-align: right;">{{ book.title }}</td>
+                                <td style="text-align: right;">
+                                    {% if book.pdf %}
+                                    <a href="{{ book.pdf.url }}" download class="btn btn-outline-success">دانلود فایل</a>
+                                    {% else %}
+                                    <span class="text-muted">فایلی وجود ندارد</span>
+                                    {% endif %}
+                                </td>
+
                             </tr>
-                            </thead>
-                            <tbody>
+                            <!-- end for and if -->
+                        {% endfor %}
+                        {% endif %}
+                        </tbody>
+                    </table>
 
-
-                           <!-- if and for -->
-                           {% if books %}
-                           {% for book in books %}
-
-                        
-                                <tr>
-                                  <td>{{ book.id }}</td>
-                                  <td>
-                                    {% if book.cover %}
-                                    <img src="{{ book.cover.url }}" alt="{{ book.title}}" style="height: 100px; width: 100px">
-                                    {% else %}
-                                    <span class="text-muted">No Cover</span>
-                                    {% endif %}
-                                   </td>
-                                  <td>{{ book.title }}</td>
-                                    <td>
-                                        {% if book.pdf %}
-                                    <a href="{{ book.pdf.url }}" class="btn btn-outline-primary" target="_blank">View PDF</a>
-                                    {% else %}
-                                    <span class="text-muted">No PDF</span>
-                                    {% endif %}
-                                  </td>
-
-
-                                    <td>
-                                        {% if book.pdf %}
-                                    <a href="{{ book.pdf.url }}" download class="btn btn-outline-success">Download PDF</a>
-                                    {% else %}
-                                    <span class="text-muted">No PDF</span>
-                                    {% endif %}
-                                    
-                                  </td>
-                                  
-                                </tr>
-
-                                <!-- end for and if -->
+                        {% if is_paginated %}
+                        <div class="pagination-wrapper">
+                            <ul class="pagination">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </span>
+                                </li>
+                                {% endif %}
+                                {% for i in paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        {{ i }} <span class="sr-only">(current)</span>
+                                    </span>
+                                </li>
+                                {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
                                 {% endfor %}
-                               {% endif %} 
-                            </tbody>
-                        </table>
-
-                          {% if is_paginated %}
-  <ul class="pagination">
-    {% if page_obj.has_previous %}
-      <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
-    {% else %}
-      <li class="disabled"><span>&laquo;</span></li>
-    {% endif %}
-    {% for i in paginator.page_range %}
-      {% if page_obj.number == i %}
-        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-      {% else %}
-        <li><a href="?page={{ i }}">{{ i }}</a></li>
-      {% endif %}
-    {% endfor %}
-    {% if page_obj.has_next %}
-      <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
-    {% else %}
-      <li class="disabled"><span>&raquo;</span></li>
-    {% endif %}
-  </ul>
-{% endif %}
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% endif %}
 
 
 

@@ -1,6 +1,21 @@
 /*
  * Table styles
  */
+ @media only screen and (max-width : 400px){
+  table.dataTable {
+    width: 100%;
+    margin: 0 auto;
+    clear: both;
+    border-collapse: separate;
+    border-spacing: 0;
+    /*
+     * Header and footer styles
+     */
+    /*
+     * Body styles
+     */
+  }
+ }
 table.dataTable {
   width: 100%;
   margin: 0 auto;

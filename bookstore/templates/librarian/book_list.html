@@ -53,11 +53,7 @@
                                 <tr>
                                   <td>{{ book.id }}</td>
                                   <td>
-                                    {% if book.cover %}
-                                    <img src="{{ book.cover.url }}" alt="{{ book.title }}" style="width:100px; height: 100px">
-                                    {% else %}
-                                    <span class="text-muted">No cover</span>
-                                    {% endif %}
+                                    {{ book.author }}
                                    </td>
 
                                   

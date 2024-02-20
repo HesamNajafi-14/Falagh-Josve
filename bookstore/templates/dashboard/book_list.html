@@ -16,7 +16,7 @@
                 <div class="card mb-3">
                 <div class="card-header">
                     <i class="fas fa-table text-primary"></i>
-                    Recent Added Books
+                    جزوه هایی که اخیرا اضافه شده
                 </div>
                 <div class="card-body">
 
@@ -53,11 +53,7 @@
                                 <tr>
                                   <td>{{ book.id }}</td>
                                   <td>
-                                    {% if book.cover %}
-                                    <img src="{{ book.cover.url }}" alt="{{ book.title }}" style="width:100px; height: 100px">
-                                    {% else %}
-                                    <span class="text-muted">No cover</span>
-                                    {% endif %}
+                                    {{ book.author }}
                                    </td>
 
                                   
@@ -72,7 +68,7 @@
                                    {% endif %}
                                   </td>
                                     <td>
-                                    {% if book.cover %}
+                                    {% if book.pdf %}
                                       <a href="{{ book.pdf.url }}" download class="btn btn-outline-success">
                                     Download PDF</a>
                                     {% else %}

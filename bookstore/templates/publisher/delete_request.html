@@ -12,15 +12,16 @@
 
 
 
-<div class="col-sm-6" style="padding-top: 87px">
+<div class="col-sm-6" style="padding-top: 87px" >
     <div class="card">
-  <div class="card-header">
+  <div class="card-header" style="text-align: right;">
           <i class="fas fa-table text-primary"></i>
-    Enter book ID To Delete
+    ایدی جزوه مورد نظر برای حذف را وارد نمایید
   </div>
-  <center><p class="">Note: Make sure the book you request to be deleted</br>
-  was uploaded by you. Unless otherwise, the book will</br>
-not be deleted</p></center>
+  <center>
+    <p class="" style="color: red;">نکته: مطمئن شوید جزوه‌ای که درخواست حذف آن را می‌دهید توسط خودتان آپلود شده باشد
+    در غیر این صورت جزوه حذف نخواهد شد</p>
+</center>
 </div>
 
 
@@ -30,12 +31,12 @@ not be deleted</p></center>
 <div class="row">
 	<div class="col-sm-4"></div>
 	<div class="form-group">
-    <form action="{% url 'delete_request' %}" method="POST">
+    <form action="{% url 'delete_request' %}" method="POST" style="text-align: right;">
     {% csrf_token %}
-  <label for="comment">Type In Book ID</label>
+  <label for="comment">ایدی را بنویسید</label>
   <textarea class="form-control" rows="5" id="comment" name="delete_request"></textarea>
   <br>
-  <a href=""><button type="submit" class="btn btn-primary"> Send</button></a>
+  <a href=""><button type="submit" class="btn btn-primary"> ارسال</button></a>
 </form>
 <br>
 <br>
