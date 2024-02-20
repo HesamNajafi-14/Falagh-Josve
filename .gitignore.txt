@@ -1,3 +1,4 @@
-media/
-static/
-venv/
+/media/
+/static/
+/venv/
+/db.sqlite3
