@@ -1,4 +1,0 @@
-/media/*
-/static/*
-/venv/
-/db.sqlite3
